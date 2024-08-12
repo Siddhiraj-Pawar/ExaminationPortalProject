@@ -1,0 +1,114 @@
+package com.app.servicesImplementation;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.configurations.JwtUtil;
+import com.app.models.LoginRequest;
+import com.app.models.LoginResponse;
+import com.app.models.Role;
+import com.app.models.User;
+import com.app.repository.RoleRepository;
+import com.app.repository.UserRepository;
+import com.app.services.AuthService;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+@Service
+public class AuthServiceImpl implements AuthService {
+
+    @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserDetailsServiceImpl userDetailsServiceImpl;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+//    @Override
+//    public User registerUserService(User user) throws Exception {
+//        User temp = userRepository.findByUsername(user.getUsername());
+//        if (temp != null) {
+//            throw new Exception("User Already Exists");
+//        } else {
+//            Role role = roleRepository.findById("USER").isPresent() ? roleRepository.findById("USER").get() : null;
+//            Set<Role> userRoles = new HashSet<>();
+//            userRoles.add(role);
+//            user.setRoles(userRoles);
+//            user.setPassword(passwordEncoder.encode(user.getPassword()));
+//            return userRepository.save(user);
+//        }
+//    }
+    
+    @Transactional
+    public User registerUserService(User user) throws Exception{
+        // Check if the user already exists
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new Exception("User Already Exists");
+        }
+
+        // Retrieve or create the "USER" role
+        Role role = roleRepository.findById("USER").orElseGet(() -> {
+            Role newRole = Role.builder()
+                .roleName("USER")
+                .roleDescription("Default Role provided to each user")
+                .build();
+            return roleRepository.save(newRole);
+        });
+
+        // Set the role and encode the password
+        user.setRoles(Set.of(role));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Save the user
+        return userRepository.save(user);
+    }
+
+
+//    public LoginResponse loginUserService(LoginRequest loginRequest) throws Exception {
+//
+//        authenticate(loginRequest.getUsername(), loginRequest.getPassword());
+//        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(loginRequest.getUsername());
+//        String token = jwtUtil.generateToken(userDetails);
+//        return new LoginResponse(userRepository.findByUsername(loginRequest.getUsername()), token);
+//    }
+    
+    public LoginResponse loginUserService(LoginRequest loginRequest) throws Exception {
+        authenticate(loginRequest.getUsername(), loginRequest.getPassword());
+        
+        
+        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(loginRequest.getUsername());
+        String token = jwtUtil.generateToken(userDetails);
+        return new LoginResponse(userRepository.findByUsername(loginRequest.getUsername()), token);
+    }
+
+    private void authenticate(String username, String password) throws Exception {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+    }
+
+//    private void authenticate(String username, String password) throws Exception {
+//        try {
+//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+//        } catch (DisabledException e) {
+//            throw new Exception("USER_DISABLED", e);
+//        } catch (BadCredentialsException e) {
+//            throw new Exception("INVALID_CREDENTIALS", e);
+//        }
+//    }
+}
