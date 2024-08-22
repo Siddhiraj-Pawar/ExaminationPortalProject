@@ -10,14 +10,14 @@ import javax.persistence.*;
 @Getter
 @Setter
 @ToString
-@Table(name = "questions")
+@Table(name = "quetions")
 public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quesId;
 
-    @Column(name = "question", length = 5000)
+    @Column(name = "quetion", length = 5000)
     private String content;
 
     @Column(name = "image")

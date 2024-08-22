@@ -19,6 +19,7 @@ import UserQuizManualPage from "./pages/users/UserQuizManualPage";
 import UserQuestionsPage from "./pages/users/UserQuestionsPage";
 import UserQuizResultPage from "./pages/users/UserQuizResultPage";
 import AdminQuizResultPage from "./pages/admin/AdminQuizResultPage";
+import Recovery from "./pages/Recovery";
 
 const App = () => {
   return (
@@ -28,6 +29,8 @@ const App = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/recovery" element={<Recovery />} />
+        
         <Route path="/adminProfile" element={<AdminProfilePage />} />
         <Route path="/adminCategories" element={<AdminCategoriesPage />} />
         <Route path="/adminAddCategory" element={<AdminAddCategoryPage />} />

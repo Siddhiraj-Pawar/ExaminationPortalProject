@@ -26,10 +26,52 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//
+//        final String requestTokenHeader = request.getHeader("Authorization");
+//
+//        String username = null;
+//        String jwtToken = null;
+//
+//        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+//            jwtToken = requestTokenHeader.substring(7);
+//            try {
+//                username = jwtUtil.extractUsername(jwtToken);
+//            } catch (IllegalArgumentException e) {
+//                System.out.println("Unable to get JWT Token");
+//            } catch (ExpiredJwtException e) {
+//                System.out.println("JWT Token has expired");
+//            }
+//        } else {
+//            System.out.println("JWT token does not start with Bearer");
+//        }
+//
+//        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//
+//            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
+//            if (jwtUtil.validateToken(jwtToken, userDetails)) {
+//                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+//            } else {
+//                System.out.println("Token is not valid");
+//            }
+//        }
+//        filterChain.doFilter(request, response);
+//    }
+    
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         final String requestTokenHeader = request.getHeader("Authorization");
+        final String requestURI = request.getRequestURI();
+
+        // Skip JWT validation for specific endpoints
+        if (requestURI.equals("/api/reset-password") || requestURI.equals("/api/forgot-password") || requestURI.equals("/api/register") || requestURI.equals("/api/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String username = null;
         String jwtToken = null;
@@ -48,7 +90,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
             UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -60,4 +101,5 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
 }

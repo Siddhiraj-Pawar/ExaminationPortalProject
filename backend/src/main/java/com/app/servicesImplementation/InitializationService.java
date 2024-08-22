@@ -41,11 +41,11 @@ public class InitializationService {
         }
 
         // Check if the admin user already exists
-        if (userRepository.findByUsername("admin") == null) {
+        if (userRepository.findByUsername("admin@gmail.com") == null) {
             User adminUser = new User();
             adminUser.setFirstName("Admin");
             adminUser.setLastName("User");
-            adminUser.setUsername("admin");
+            adminUser.setUsername("admin@gmail.com");
             adminUser.setPassword(passwordEncoder.encode("adminpassword")); // Use a strong password in production
             adminUser.setRoles(Set.of(role));
             adminUser.setActive(true);

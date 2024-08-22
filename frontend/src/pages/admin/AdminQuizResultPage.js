@@ -47,8 +47,8 @@ const AdminQuizResultPage = () => {
                 <th>Quiz Id</th>
                 <th>Quiz Name</th>
                 <th>Category Name</th>
-                <th>Obtained Marks</th>
                 <th>Total Marks</th>
+                <th>Obtained Marks</th>
                 <th>Date</th>
               </tr>
             </thead>
