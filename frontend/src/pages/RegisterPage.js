@@ -10,7 +10,7 @@ import * as authConstants from "../constants/authConstants";
 import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
-  const [firstName, setFirstName] = useState("");
+  const [firstName, setFirstName] = useState("");//const
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
